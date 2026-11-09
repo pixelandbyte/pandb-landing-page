@@ -1,5 +1,5 @@
 # pandb-landing-page
-The landing page for all [pixelandbyte.com](https://pixelandbyte.com) projects, plus a client portal.  It also simplifies communication to and from clients.
+The landing page for all [pixelandbyte.com](https://pixelandbyte.com) projects. It also inclides a client portal to simplify communication to and from clients.
  
 ## What's here
  
