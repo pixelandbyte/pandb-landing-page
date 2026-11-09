@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client Portal | Pixel and Byte</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --ink: #1c1f24;
+    --muted: #5f6672;
+    --line: #dfe2e7;
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --accent: #2f5bea;
+    --accent-ink: #ffffff;
+    --ok: #1d7a46;
+    --err: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { font-weight: 700; letter-spacing: -0.01em; color: inherit; text-decoration: none; }
+  .brand span { color: var(--accent); }
+  .who { font-size: 14px; color: var(--muted); display: flex; gap: 12px; align-items: center; }
+  main { flex: 1; display: flex; justify-content: center; padding: 40px 16px; }
+  .card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 32px;
+    align-self: flex-start;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; font-size: 15px; }
+  .intro { margin: 0 0 6px; font-size: 15px; }
+  .platforms {
+    margin: 0 0 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 18px 0 6px; }
+  .hint { font-weight: 400; color: var(--muted); }
+  input, select, textarea {
+    width: 100%;
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+  }
+  textarea { min-height: 140px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row label { margin-top: 18px; }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 18px;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+    width: 100%;
+    margin-top: 24px;
+  }
+  button:disabled { opacity: 0.6; cursor: default; }
+  .link-btn {
+    background: none;
+    color: var(--accent);
+    width: auto;
+    padding: 0;
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .msg { margin-top: 16px; font-size: 14px; }
+  .msg.ok { color: var(--ok); }
+  .msg.err { color: var(--err); }
+  .notice {
+    background: #fff8e6;
+    border: 1px solid #f2d58a;
+    color: #6b4e00;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  footer { text-align: center; font-size: 13px; color: var(--muted); padding: 20px; }
+  footer a { color: var(--muted); }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) {
+    .card { padding: 24px 20px; }
+    .row { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="../">Pixel <span>and</span> Byte</a>
+  <div class="who" id="who" hidden>
+    <span id="who-email"></span>
+    <button class="link-btn" id="signout" type="button">Sign out</button>
+  </div>
+</header>
+
+<main>
+  <!-- SIGN IN -->
+  <section class="card" id="view-login" hidden>
+    <div class="notice" id="demo-notice" hidden>Demo mode: no login service is connected yet, so any email will work.</div>
+    <p class="intro">Product labels for online sellers, handled for you. We prepare your artwork, set up your print files, and keep your label orders running, so you can focus on selling.</p>
+    <p class="platforms">For stores on Shopify, Etsy, Amazon, TikTok Shop, Squarespace, WooCommerce, Wix, and more.</p>
+    <h1>Client sign in</h1>
+    <p class="sub">Enter your email and we'll send you a sign-in link. No password needed.</p>
+    <form id="login-form">
+      <label for="login-email">Email</label>
+      <input id="login-email" type="email" autocomplete="email" required>
+      <button type="submit" id="login-btn">Send me a sign-in link</button>
+      <p class="msg" id="login-msg" role="status"></p>
+    </form>
+  </section>
+
+  <!-- REQUEST FORM -->
+  <section class="card" id="view-request" hidden>
+    <h1>Request work</h1>
+    <p class="sub">Tell us what your labels need. We'll confirm by email.</p>
+    <form id="request-form">
+      <label for="req-type">What kind of work?</label>
+      <select id="req-type" name="type" required>
+        <option value="">Choose one</option>
+        <option>Label reorder</option>
+        <option>New product label</option>
+        <option>Change to an existing label</option>
+        <option>Packaging or other print</option>
+        <option>Store or automation help</option>
+        <option>Something else</option>
+      </select>
+
+      <label for="req-platform">Where do you sell?</label>
+      <select id="req-platform" name="platform">
+        <option value="">Choose one</option>
+        <option>Shopify</option>
+        <option>Etsy</option>
+        <option>Amazon</option>
+        <option>TikTok Shop</option>
+        <option>Squarespace</option>
+        <option>WooCommerce</option>
+        <option>Wix</option>
+        <option>In person / wholesale</option>
+        <option>Several of these</option>
+        <option>Other</option>
+      </select>
+
+      <label for="req-title">Short title</label>
+      <input id="req-title" name="title" maxlength="120" required placeholder="e.g. Reorder 500 tincture labels">
+
+      <label for="req-details">Details</label>
+      <textarea id="req-details" name="details" required placeholder="What should be done? Include sizes, quantities, wording changes, or links."></textarea>
+
+      <div class="row">
+        <div>
+          <label for="req-due">Needed by <span class="hint">(optional)</span></label>
+          <input id="req-due" name="due_date" type="date">
+        </div>
+        <div>
+          <label for="req-priority">Priority</label>
+          <select id="req-priority" name="priority">
+            <option>Normal</option>
+            <option>Urgent</option>
+            <option>Whenever</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="req-files">Files <span class="hint">(optional, up to 5)</span></label>
+      <input id="req-files" name="files" type="file" multiple>
+
+      <button type="submit" id="req-btn">Send request</button>
+      <p class="msg" id="req-msg" role="status"></p>
+    </form>
+  </section>
+
+  <!-- DONE -->
+  <section class="card" id="view-done" hidden>
+    <h1>Request received</h1>
+    <p class="sub">Thank you. We'll follow up by email shortly.</p>
+    <button type="button" id="another">Send another request</button>
+  </section>
+</main>
+
+<footer>
+  We use your email and files only to do your work. We never sell or share them.<br>
+  Need help? Email <a href="mailto:pixelandbyte@gmail.com">pixelandbyte@gmail.com</a> · <a href="../">Pixel and Byte home</a>
+</footer>
+
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const CONFIG = Object.assign({ MAX_FILES: 5, MAX_FILE_MB: 20 }, window.PB_CONFIG || {});
+
+const DEMO = !CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY;
+const sb = DEMO ? null : supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+let session = null;
+
+const $ = (id) => document.getElementById(id);
+const views = ["view-login", "view-request", "view-done"];
+function show(id) {
+  views.forEach(v => $(v).hidden = v !== id);
+  const signedIn = id !== "view-login";
+  $("who").hidden = !signedIn;
+  $("who-email").textContent = signedIn && session ? session.user.email : "";
+}
+function setMsg(el, text, kind) {
+  el.textContent = text;
+  el.className = "msg" + (kind ? " " + kind : "");
+}
+
+/* ---- Sign in ---- */
+$("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = $("login-email").value.trim();
+  const btn = $("login-btn"), msg = $("login-msg");
+
+  if (DEMO) {
+    session = { user: { email }, access_token: "demo" };
+    show("view-request");
+    return;
+  }
+
+  btn.disabled = true;
+  setMsg(msg, "Sending...");
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin + window.location.pathname,
+      shouldCreateUser: false
+    }
+  });
+  btn.disabled = false;
+  if (error) {
+    setMsg(msg, "We couldn't send a link to that email. If you're a client, contact us and we'll get you set up.", "err");
+  } else {
+    setMsg(msg, "Check your email for a sign-in link. You can close this tab.", "ok");
+  }
+});
+
+$("signout").addEventListener("click", async () => {
+  if (sb) await sb.auth.signOut();
+  session = null;
+  show("view-login");
+});
+
+/* ---- Request ---- */
+$("request-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("req-btn"), msg = $("req-msg");
+  const files = Array.from($("req-files").files);
+
+  if (files.length > CONFIG.MAX_FILES) {
+    return setMsg(msg, `Please attach no more than ${CONFIG.MAX_FILES} files.`, "err");
+  }
+  const tooBig = files.find(f => f.size > CONFIG.MAX_FILE_MB * 1024 * 1024);
+  if (tooBig) {
+    return setMsg(msg, `"${tooBig.name}" is over ${CONFIG.MAX_FILE_MB} MB. Please send a link to it in the details instead.`, "err");
+  }
+
+  const data = new FormData();
+  data.append("email", session.user.email);
+  data.append("type", $("req-type").value);
+  data.append("platform", $("req-platform").value);
+  data.append("title", $("req-title").value.trim());
+  data.append("details", $("req-details").value.trim());
+  data.append("due_date", $("req-due").value);
+  data.append("priority", $("req-priority").value);
+  data.append("submitted_at", new Date().toISOString());
+  data.append("source", "client portal request");
+  data.append("access_token", session.access_token); // lets Make verify the sender with Supabase
+  files.forEach((f, i) => data.append("file" + (i + 1), f, f.name));
+
+  if (!CONFIG.REQUEST_WEBHOOK_URL) {
+    console.log("Demo request:", Object.fromEntries(data.entries()));
+    $("request-form").reset();
+    setMsg(msg, "");
+    show("view-done");
+    return;
+  }
+
+  btn.disabled = true;
+  setMsg(msg, "Sending...");
+  try {
+    const res = await fetch(CONFIG.REQUEST_WEBHOOK_URL, { method: "POST", body: data });
+    if (!res.ok) throw new Error(res.status);
+    $("request-form").reset();
+    setMsg(msg, "");
+    show("view-done");
+  } catch (err) {
+    setMsg(msg, "Something went wrong sending your request. Please try again, or email us.", "err");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("another").addEventListener("click", () => show("view-request"));
+
+/* ---- Start ---- */
+(async function init() {
+  if (DEMO) {
+    $("demo-notice").hidden = false;
+    show("view-login");
+    return;
+  }
+  const { data } = await sb.auth.getSession();
+  session = data.session;
+  show(session ? "view-request" : "view-login");
+  sb.auth.onAuthStateChange((_event, s) => {
+    session = s;
+    if (!s) show("view-login");
+    else if ($("view-login").hidden === false) show("view-request");
+  });
+})();
+</script>
+</body>
+</html>
