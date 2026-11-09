@@ -1,5 +1,5 @@
 # pandb-landing-page
-An Astro landing page for [pixelandbyte.com](https://pixelandbyte.com): the home page for all Pixel and Byte projects, plus a client portal.
+The landing page for [pixelandbyte.com](https://pixelandbyte.com): the home page for all Pixel and Byte projects, plus a client portal.  Simplifies communication to and from clients.
  
 ## What's here
  
